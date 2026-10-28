@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 // routes/payments.js
 //
 // YOUR TASK: make POST /payments idempotent.
@@ -8,7 +8,7 @@
 // duplicate charge. Fix it using an Idempotency-Key so a retry is processed exactly once.
 //
 // The in-memory helpers you need are in ../store:
-//   idempotency  — a Map you use as  key -> { status, body }
+//   idempotency  — a Map you use as key -> { status, body }
 //   charges      — the array of REAL charges (push once per real charge)
 //   nextChargeId — returns a fresh 'ch_N' id
 //
@@ -18,17 +18,39 @@
 //   3. NEW key       -> create exactly ONE charge, store { status, body } under the key, return it
 //   4. DIFFERENT key -> a separate operation (falls out of rules 2 and 3 naturally)
 //
-// Hint: read the key from  req.headers['idempotency-key'].
+// Hint: read the key from req.headers['idempotency-key'].
 
-const router = require('express').Router();
-const { charges, idempotency, nextChargeId } = require('../store');
+const router = require("express").Router();
+const { charges, idempotency, nextChargeId } = require("../store");
 
-router.post('/', (req, res) => {
+router.post("/", (req, res) => {
   // TODO: implement rules 1-3 above. The stub below always charges — remove it.
+  const key = req.headers["idempotency-key"];
+
+  if (!key) {
+    return res.status(400).json({
+      error: {
+        code: "IDEMPOTENCY_KEY_REQUIRED",
+        message: "idempotency-key header is required",
+      },
+    });
+  }
+
+  if (idempotency.has(key)) {
+    const storedResponse = idempotency.get(key);
+    return res.status(storedResponse.status).json(storedResponse.body);
+  }
+
   const amount = req.body && req.body.amount;
-  const charge = { id: nextChargeId(), amount, status: 'charged' };
+  const charge = { id: nextChargeId(), amount, status: "charged" };
   charges.push(charge);
-  return res.status(201).json({ id: charge.id, amount: charge.amount, status: charge.status });
+
+  const body = { id: charge.id, amount: charge.amount, status: charge.status };
+  const result = { status: 201, body };
+
+  idempotency.set(key, result);
+
+  return res.status(result.status).json(result.body);
 });
 
 module.exports = router;
