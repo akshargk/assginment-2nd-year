@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 // ─── YOUR FILE, implement this ───────────────────────────────────────────────
 // In-memory OTP store for email verification.
@@ -35,19 +35,55 @@
 const store = new Map();
 
 function generateOTP() {
-  throw new Error('not implemented');
+  return String(Math.floor(100000 + Math.random() * 900000));
 }
 
 function storeOTP(email, otp) {
-  throw new Error('not implemented');
+  store.set(email, {
+    otp: otp,
+    expiresAt: Date.now() + 10 * 60 * 1000,
+    attempts: 0,
+  });
 }
 
 function verifyOTP(email, code) {
-  throw new Error('not implemented');
+  const entry = store.get(email);
+
+  // 1. Not found
+  if (!entry) {
+    return { ok: false, reason: "not_found" };
+  }
+
+  // 2. Expired
+  if (Date.now() > entry.expiresAt) {
+    store.delete(email);
+    return { ok: false, reason: "expired" };
+  }
+
+  // 3. Attempts >= 3
+  if (entry.attempts >= 3) {
+    return { ok: false, reason: "too_many_attempts" };
+  }
+
+  // 4. Wrong code
+  if (entry.otp !== code) {
+    entry.attempts++;
+    return { ok: false, reason: "wrong_code" };
+  }
+
+  // 5. Correct
+  store.delete(email);
+  return { ok: true };
 }
 
 function markVerified(email) {
-  throw new Error('not implemented');
+  console.log(`Email verified: ${email}`);
 }
 
-module.exports = { generateOTP, storeOTP, verifyOTP, markVerified, _store: store };
+module.exports = {
+  generateOTP,
+  storeOTP,
+  verifyOTP,
+  markVerified,
+  _store: store,
+};

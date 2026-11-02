@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 // ─── YOUR FILE, implement this ───────────────────────────────────────────────
 // Create a BullMQ Queue named 'email' with a Redis connection.
@@ -8,7 +8,18 @@
 //                       process.env.REDIS_PORT (default 6379)
 
 // TODO: implement
-const emailQueue = null;
-const connection = null;
+
+const { Queue } = require("bullmq");
+const IORedis = require("ioredis");
+
+const connection = new IORedis({
+  host: process.env.REDIS_HOST || "localhost",
+  port: Number(process.env.REDIS_PORT) || 6379,
+  maxRetriesPerRequest: null,
+});
+
+const emailQueue = new Queue("email", {
+  connection,
+});
 
 module.exports = { emailQueue, connection };
