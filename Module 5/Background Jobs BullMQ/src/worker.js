@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 // ─── YOUR FILE, implement this ───────────────────────────────────────────────
 // Create a BullMQ Worker that processes jobs from the 'email' queue.
@@ -11,3 +11,45 @@
 //     Returning without throwing → job completed.
 
 // TODO: implement
+
+const { Worker } = require("bullmq");
+const { connection } = require("./queue");
+const transporter = require("./email");
+
+const worker = new Worker(
+  "email",
+  async (job) => {
+    if (job.name === "otp") {
+      const { to, otp } = job.data;
+
+      await transporter.sendMail({
+        to: to,
+        subject: "Your verification code",
+        text: `Your OTP is ${otp}`,
+      });
+
+      console.log(`OTP email sent successfully to ${to}`);
+    }
+  },
+  {
+    connection,
+    defaultJobOptions: {
+      attempts: 3,
+      backoff: {
+        type: "exponential",
+        delay: 1000,
+      },
+    },
+  },
+);
+
+// Configure retry settings for jobs
+worker.on("completed", (job) => {
+  console.log(`Job ${job.id} completed successfully`);
+});
+
+worker.on("failed", (job, err) => {
+  console.error(`Job ${job?.id} failed: ${err.message}`);
+});
+
+module.exports = worker;

@@ -1,0 +1,12 @@
+{
+  "name": "node-starter",
+  "private": true,
+  "scripts": {
+    "test1": "npm i && npx jasmine",
+    "test": "npm i && node spec/run-jasmine.js"
+  },
+  "devDependencies": {
+    "jasmine": "^5.2.0",
+    "jasmine-reporters": "^2.5.2"
+  }
+}

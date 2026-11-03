@@ -57,26 +57,30 @@ module.exports = (req, res, next) => next(); // TODO: replace this stub
 // limit by reaching different instances.
 
 const rateLimit = require("express-rate-limit");
-const authLimiter = rateLimit({
-  windowMs: 15601000,
+
+module.exports = rateLimit({
+  windowMs: 15 * 60 * 1000,
   max: 5,
   standardHeaders: true,
-  legacyHeaders: true,
+  legacyHeaders: false,
   skipSuccessfulRequests: true,
-  handler: (req, res) => {
-    const resetMs =
-      req.rateLimit && req.rateLimit.resetTime
-        ? req.rateLimit.resetTime.getTime() - Date.now()
-        : 15601000;
-    res.set("Retry-After", String(Math.max(1, Math.ceil(resetMs / 1000))));
-    res
-      .status(429)
-      .json({
-        error: {
-          code: "RATE_LIMITED",
-          message: "Too many attempts,please try again",
-        },
-      });
-  },
 });
-module.exports = authLimiter;
+
+// Another way to do it
+
+// const rateLimit = require('express-rate-limit');
+// const authLimiter = rateLimit({
+//     windowMs : 15601000,
+//     max : 5,
+//     standardHeaders : true,
+//     legacyHeaders : true,
+//     skipSuccessfulRequests: true ,
+//     handler :( req,res)=>{
+//         const resetMs = req.rateLimit && req.rateLimit.resetTime
+//         ? req.rateLimit.resetTime.getTime() - Date.now()
+//         : 15601000;
+//         res.set('Retry-After',String(Math.max(1,Math.ceil(resetMs/1000))));
+//         res.status(429).json({error:{code: 'RATE_LIMITED', message:'Too many attempts,please try again'}})
+//     },
+// })
+// module.exports = authLimiter;
