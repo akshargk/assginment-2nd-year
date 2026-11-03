@@ -55,8 +55,7 @@ function streamFile() {
 //       so peak memory stays flat regardless of file size.
 //
 // YOUR EXPLANATION:
-
-//
+//readFile holds the whole file in memory, while a stream moves the file in small chunks. Therefore, streams use less memory and are better for managing large files.
 
 // Run both approaches.
 
