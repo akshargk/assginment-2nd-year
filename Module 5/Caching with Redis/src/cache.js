@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 // ─── YOUR FILE — implement this ───────────────────────────────────────────────
 // Implement three Redis helper functions using ioredis.
@@ -22,23 +22,47 @@
 //   port: parseInt(process.env.REDIS_PORT || '6379')
 //   lazyConnect: true
 
-const Redis = require('ioredis');
+const Redis = require("ioredis");
 
-// TODO: create Redis instance
+// Create Redis instance
+const redis = new Redis({
+  host: process.env.REDIS_HOST || "localhost",
+  port: parseInt(process.env.REDIS_PORT || "6379", 10),
+  lazyConnect: true,
+});
 
-// TODO: implement cacheGet
+// Implement cacheGet
 async function cacheGet(key) {
-  throw new Error('not implemented');
+  try {
+    const data = await redis.get(key);
+
+    if (data === null) {
+      return null;
+    }
+
+    return JSON.parse(data);
+  } catch (error) {
+    console.error("[cacheGet] error:", error);
+    return null;
+  }
 }
 
-// TODO: implement cacheSet
+// Implement cacheSet
 async function cacheSet(key, data, ttlSeconds) {
-  throw new Error('not implemented');
+  try {
+    await redis.set(key, JSON.stringify(data), "EX", ttlSeconds);
+  } catch (error) {
+    console.error("[cacheSet] error:", error);
+  }
 }
 
-// TODO: implement cacheDel
+// Implement cacheDel
 async function cacheDel(key) {
-  throw new Error('not implemented');
+  try {
+    await redis.del(key);
+  } catch (error) {
+    console.error("[cacheDel] error:", error);
+  }
 }
 
 module.exports = { cacheGet, cacheSet, cacheDel };
