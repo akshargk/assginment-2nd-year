@@ -1,10 +1,28 @@
 function seedPosts() {
   return [
-    { id: 1, title: 'Caching 101', author: 'maya', likes: 0, createdAt: 1 },
-    { id: 2, title: 'Queues vs Cron', author: 'raj', likes: 1, createdAt: 2 },
-    { id: 3, title: 'Why indexes matter', author: 'maya', likes: 3, createdAt: 3 },
-    { id: 4, title: 'JWT expiry gotchas', author: 'sam', likes: 2, createdAt: 4 },
-    { id: 5, title: 'Cursor pagination', author: 'maya', likes: 5, createdAt: 5 }
+    { id: 1, title: "Caching 101", author: "maya", likes: 0, createdAt: 1 },
+    { id: 2, title: "Queues vs Cron", author: "raj", likes: 1, createdAt: 2 },
+    {
+      id: 3,
+      title: "Why indexes matter",
+      author: "maya",
+      likes: 3,
+      createdAt: 3,
+    },
+    {
+      id: 4,
+      title: "JWT expiry gotchas",
+      author: "sam",
+      likes: 2,
+      createdAt: 4,
+    },
+    {
+      id: 5,
+      title: "Cursor pagination",
+      author: "maya",
+      likes: 5,
+      createdAt: 5,
+    },
   ];
 }
 
@@ -30,7 +48,7 @@ function createPost({ title, author }) {
     title,
     author,
     likes: 0,
-    createdAt: posts.length + 1
+    createdAt: posts.length + 1,
   };
   posts.push(post);
   return post;
@@ -48,5 +66,5 @@ module.exports = {
   getAllPosts,
   getPostById,
   createPost,
-  incrementLikes
+  incrementLikes,
 };
